@@ -30,7 +30,6 @@ cat << "EOF"
 `------' `-----'`--' `--' `-----'`--' '--'    `------'`-----' `--' '--'     `--''--' `--'   
                                                                                             
 EOF
-exit
 echo -e "\n${NOCOLOR} Welcome to ESK Installer echo ${GREEN} V 1.0! ${NOCOLOR}"
 echo -e "\n${ORANGE}Enjoy Coffee while I do this for you :) ${NOCOLOR}"
 
