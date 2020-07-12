@@ -1,0 +1,188 @@
+version: '3.5'
+
+services:
+  syslog-ng:
+    container_name: syslog01
+    env_file: .env 
+    restart: always
+    environment:
+      - TZ=${TIMEZONE}
+    build:
+      context: ./
+      dockerfile: ./syslog-ng/syslog.dockerfile
+      args:
+        - SYSLOG_VERSION=${SYSLOG_VERSION}
+        - TIMEZONE=${TIMEZONE}
+    ports:
+      - "514:514/udp"
+      - "514:514/tcp"
+    labels:
+      Service name: "Syslog Log Collector"
+    networks:
+      - syslog
+    volumes:
+      - type: bind 
+        source: ${SYSLOG_CONF_DIR}
+        target: /etc/syslog-ng/ 
+      # - type: bind
+        # source: /etc/localtime 
+        # target: /etc/localtime
+      - certs:/etc/syslog-ng/certs/
+    # - "/etc/timezone:/etc/timezone:ro"
+    # - "/etc/localtime:/etc/localtime:ro"      
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    container_name: es01
+    restart: always
+    env_file: .env 
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.license.self_generated.type=basic
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.http.ssl.enabled=true 
+      - xpack.security.http.ssl.key=$CERTS_DIR/es01/es01.key
+      - xpack.security.http.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.http.ssl.certificate=$CERTS_DIR/es01/es01.crt
+      - xpack.security.transport.ssl.enabled=true 
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es01/es01.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es01/es01.key
+      #- TZ=${TIMEZONE}      
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+      - certs:$CERTS_DIR
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+      - syslog
+    healthcheck:
+      test: curl --cacert $CERTS_DIR/ca/ca.crt -s https://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5  
+
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    container_name: es02
+    restart: always
+    env_file: .env 
+    environment:
+      - node.name=es02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.license.self_generated.type=basic
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.http.ssl.enabled=true 
+      - xpack.security.http.ssl.key=$CERTS_DIR/es02/es02.key
+      - xpack.security.http.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.http.ssl.certificate=$CERTS_DIR/es02/es02.crt
+      - xpack.security.transport.ssl.enabled=true 
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es02/es02.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es02/es02.key
+      #- TZ=${TIMEZONE}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+      - certs:$CERTS_DIR
+    networks:
+      - elastic
+      - syslog
+
+
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    container_name: es03
+    restart: always
+    env_file: .env 
+    environment:
+      - node.name=es03
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.license.self_generated.type=basic
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.http.ssl.enabled=true 
+      - xpack.security.http.ssl.key=$CERTS_DIR/es03/es03.key
+      - xpack.security.http.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.http.ssl.certificate=$CERTS_DIR/es03/es03.crt
+      - xpack.security.transport.ssl.enabled=true 
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es03/es03.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es03/es03.key
+      #- TZ=${TIMEZONE}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+      - certs:$CERTS_DIR
+    networks:
+      - elastic
+      - syslog
+
+      
+  kib01:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+    container_name: kib01
+    env_file: .env 
+    #depends_on: {"es01": {"condition": "service_healthy"}}
+    depends_on:
+      - es01
+        #condition: service_healthy
+    ports:
+      - 5601:5601
+    environment:
+      SERVERNAME: localhost 
+      ELASTICSEARCH_URL: https://es01:9200
+      ELASTICSEARCH_HOSTS: https://es01:9200
+      ELASTICSEARCH_USERNAME: ${ELASTICSEARCH_USERNAME}
+      ELASTICSEARCH_PASSWORD: ${ELASTICSEARCH_PASSWORD}
+      xpack.encryptedSavedObjects.encryptionKey: ${ENCRYPTION_KEY}
+      ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES: $CERTS_DIR/ca/ca.crt
+      SERVER_SSL_ENABLED: "true"
+      SERVER_SSL_KEY: $CERTS_DIR/kib01/kib01.key
+      SERVER_SSL_CERTIFICATE: $CERTS_DIR/kib01/kib01.crt
+      #TZ: ${TIMEZONE}
+    networks:
+      - elastic
+    volumes:
+      - certs:$CERTS_DIR
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local 
+  data03: 
+    driver: local 
+  certs:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
+  syslog:
+    driver: bridge 

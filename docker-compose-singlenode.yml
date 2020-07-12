@@ -1,0 +1,104 @@
+version: '3.5'
+
+services:
+  syslog-ng:
+    container_name: syslog01
+    restart: always
+    env_file: .env 
+    build:
+      context: ./
+      dockerfile: ./syslog-ng/syslog.dockerfile
+      args:
+        - SYSLOG_VERSION=${SYSLOG_VERSION}
+        - TIMEZONE=${TIMEZONE}
+    ports:
+      - "514:514/udp"
+      - "514:514/tcp"
+    labels:
+      Service name: "Syslog Log Collector"
+    networks:
+      - syslog
+    volumes:
+      - type: bind 
+        source: ${SYSLOG_CONF_DIR}
+        target: /etc/syslog-ng/ 
+      - certs:/etc/syslog-ng/certs/
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    container_name: es01
+    env_file: .env 
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      #- discovery.seed_hosts=es02,es03
+      #- cluster.initial_master_nodes=es01,es02,es03
+      #- cluster.initial_master_nodes=es01
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=true
+      - xpack.license.self_generated.type=basic
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.http.ssl.enabled=true 
+      - xpack.security.http.ssl.key=$CERTS_DIR/es01/es01.key
+      - xpack.security.http.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.http.ssl.certificate=$CERTS_DIR/es01/es01.crt
+      - xpack.security.transport.ssl.enabled=true 
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es01/es01.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es01/es01.key
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+      - certs:$CERTS_DIR
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+      - syslog
+    healthcheck:
+      test: curl --cacert $CERTS_DIR/ca/ca.crt -s https://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5  
+      
+  kib01:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+    container_name: kib01
+    restart: always
+    env_file: .env 
+    #depends_on: {"es01": {"condition": "service_healthy"}}
+    depends_on:
+      - es01
+        #condition: service_healthy
+    ports:
+      - 5601:5601
+    environment:
+      SERVERNAME: localhost 
+      ELASTICSEARCH_URL: https://es01:9200
+      ELASTICSEARCH_HOSTS: https://es01:9200
+      ELASTICSEARCH_USERNAME: ${ELASTICSEARCH_USERNAME}
+      ELASTICSEARCH_PASSWORD: ${ELASTICSEARCH_PASSWORD}
+      xpack.encryptedSavedObjects.encryptionKey: ${ENCRYPTION_KEY}
+      ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES: $CERTS_DIR/ca/ca.crt
+      SERVER_SSL_ENABLED: "true"
+      SERVER_SSL_KEY: $CERTS_DIR/kib01/kib01.key
+      SERVER_SSL_CERTIFICATE: $CERTS_DIR/kib01/kib01.crt
+    networks:
+      - elastic
+    volumes:
+      - certs:$CERTS_DIR
+volumes:
+  data01:
+    driver: local
+  certs:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
+  syslog:
+    driver: bridge 

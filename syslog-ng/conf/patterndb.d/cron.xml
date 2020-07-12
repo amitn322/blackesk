@@ -1,0 +1,18 @@
+<patterndb version='4' pub_date='2018-12-03'>
+  <ruleset name='patternize' id='6e60df09-5bcd-8b44-b56f-a221471b3f7b'>
+    <rules>
+      <rule id='5291500f-d47d-c743-853c-c89302a126a0' class='system' provider='patternize'>
+        <!-- support: 106 -->
+        <patterns>
+		<pattern>@QSTRING:username:()@ CMD @QSTRING:command:()@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='patternize'>(root) CMD (/usr/sbin/ntpdate pool.ntp.org &gt;/dev/null 2&gt;&amp;1)</test_message>
+            </example>
+        </examples>
+      </rule>
+      
+    </rules>
+  </ruleset>
+</patterndb>

@@ -1,0 +1,74 @@
+<patterndb version='3' pub_date='2011-09-02'>
+  <ruleset name='apache-clf' id='18c0e855-b428-4f57-bfc8-d97e82c187f6'>
+    <rules>
+      <!-- combined w/o ident -->
+      <rule id='9e2a32a4-36bc-4cb6-b32f-8b19be355392' class='system' provider='balabit'>
+        <patterns>
+          <pattern>@ESTRING:clientip: @@ESTRING:.username: @[@ESTRING:finishtime:]@ &quot;@ESTRING:request.type: @@ESTRING:url: @@ESTRING:protocol:&quot;@ @ESTRING:statuscode: @@ESTRING:size: @&quot;@ESTRING:referrer:&quot;@ &quot;@ESTRING:useragent:&quot;@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='apache'>::1 - [31/Aug/2011:11:44:02 +0200] &quot;OPTIONS * HTTP/1.0&quot; 200 152 &quot;-&quot; &quot;Apache/2.2.14 (Ubuntu) (internal dummy connection)&quot;</test_message>
+            </example>
+        </examples>
+      </rule>
+      <!-- combined w/ ident -->
+      <rule id='9e2a32a4-36bc-4cb6-b32f-8b19be355393' class='system' provider='balabit'>
+        <patterns>
+          <pattern>@ESTRING:clientip: @@ESTRING:ident: @@ESTRING:username: @[@ESTRING:finishtime:]@ &quot;@ESTRING:request.type: @@ESTRING:url: @@ESTRING:protocol:&quot;@ @ESTRING:statuscode: @@ESTRING:size: @&quot;@ESTRING:referrer:&quot;@ &quot;@ESTRING:useragent:&quot;@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='apache'>::1 - - [31/Aug/2011:11:44:02 +0200] &quot;OPTIONS * HTTP/1.0&quot; 200 152 &quot;-&quot; &quot;Apache/2.2.14 (Ubuntu) (internal dummy connection)&quot;</test_message>
+            </example>
+        </examples>
+      </rule>
+      <!-- common w/o ident-->
+      <rule id='9e2a32a4-36bc-4cb6-b32f-8b19be355390' class='system' provider='balabit'>
+        <patterns>
+          <pattern>@ESTRING:clientip: @@ESTRING:username: @[@ESTRING:finishtime:]@ &quot;@ESTRING:request.type: @@ESTRING:url: @@ESTRING:protocol:&quot;@ @ESTRING:statuscode: @@ANYSTRING:size@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='apache'>127.0.0.1 frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326</test_message>
+            </example>
+        </examples>
+      </rule>
+      <!-- common w/ ident-->
+      <rule id='9e2a32a4-36bc-4cb6-b32f-8b19be355391' class='system' provider='balabit'>
+        <patterns>
+          <pattern>@ESTRING:clientip: @@ESTRING:ident: @@ESTRING:username: @[@ESTRING:finishtime:]@ &quot;@ESTRING:request.type: @@ESTRING:url: @@ESTRING:protocol:&quot;@ @ESTRING:statuscode: @@ANYSTRING:size@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='apache'>127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326</test_message>
+            </example>
+        </examples>
+      </rule>
+	  <!-- combined with vhost and w/o ident -->
+      <rule id='9e2a32a4-36bc-4cb6-b32f-8b19be355392' class='system' provider='balabit'>
+        <patterns>
+          <pattern>@ESTRING:clientip: @@ESTRING:.username: @[@ESTRING:finishtime:]@ &quot;@ESTRING:request.type: @@ESTRING:url: @@ESTRING:protocol:&quot;@ @ESTRING:statuscode: @@ESTRING:size: @&quot;@ESTRING:referrer:&quot;@ &quot;@ESTRING:useragent:&quot;@ &quot;@ESTRING:vhost:&quot;@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='apache'>::1 - [31/Aug/2011:11:44:02 +0200] &quot;OPTIONS * HTTP/1.0&quot; 200 152 &quot;-&quot; &quot;Apache/2.2.14 (Ubuntu) (internal dummy connection)&quot; &quot;www.example.com&quot;</test_message>
+            </example>
+        </examples>
+      </rule>
+      <!-- combined w/ ident and vhost-->
+      <rule id='9e2a32a4-36bc-4cb6-b32f-8b19be355393' class='system' provider='balabit'>
+        <patterns>
+          <pattern>@ESTRING:clientip: @@ESTRING:ident: @@ESTRING:username: @[@ESTRING:finishtime:]@ &quot;@ESTRING:request.type: @@ESTRING:url: @@ESTRING:protocol:&quot;@ @ESTRING:statuscode: @@ESTRING:size: @&quot;@ESTRING:referrer:&quot;@ &quot;@ESTRING:useragent:&quot;@ &quot;@ESTRING:vhost:&quot;@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='apache'>::1 - - [31/Aug/2011:11:44:02 +0200] &quot;OPTIONS * HTTP/1.0&quot; 200 152 &quot;-&quot; &quot;Apache/2.2.14 (Ubuntu) (internal dummy connection)&quot; &quot;www.example.com&quot;</test_message>
+            </example>
+        </examples>
+      </rule>
+
+    </rules>
+  </ruleset>
+</patterndb>
+

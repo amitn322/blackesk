@@ -1,0 +1,18 @@
+<patterndb version='4' pub_date='2019-04-24'>
+  <ruleset name='patternize' id='ad077632-38d2-cb44-9780-042ee4587f5e'>
+    <rules>
+      <rule id='46e79af0-8630-a544-976e-9e73286ea9c0' class='system' provider='patternize'>
+        <!-- support: 1 -->
+        <patterns>
+          <pattern>@STRING:action:@ IN=@STRING:in_interface@ OUT=@STRING:out_interface:@ SRC=@IPv4:lanip@ DST=@IPv4:destip@ LEN=@NUMBER:length@ TOS=@NUMBER:tos@ PREC=@NUMBER:prec@ TTL=@NUMBER:ttl@ ID=@NUMBER:pcktid@ @STRING@ PROTO=@STRING:protocol@ SPT=@NUMBER:sport@ DPT=@NUMBER:dport@ SEQ=@NUMBER@ ACK=@NUMBER:ackflag@ WINDOW=@NUMBER:window@ RES=@NUMBER:resetflag@ SYN URGP=@NUMBER:urgeflag@ @ANYSTRING@</pattern>
+        </patterns>
+          <pattern>@STRING:action:@ IN=@STRING:in_interface@ OUT=@STRING:out_interface:@ SRC=@IPv4:lanip@ DST=@IPv4:destip@ LEN=@NUMBER:length@ TOS=@NUMBER:tos@ PREC=@NUMBER:prec@ TTL=@NUMBER:ttl@ ID=@NUMBER:pcktid@ @STRING@ PROTO=@STRING:protocol@ SPT=@NUMBER:sport@ DPT=@NUMBER:dport@ LEN=@NUMBER:length@</pattern>
+        <examples>
+            <example>
+                <test_message program='patternize'>kernel: ACCEPT IN=br0 OUT=vlan2 SRC=192.168.100.81 DST=74.125.195.16 LEN=52 TOS=0x00 PREC=0x00 TTL=127 ID=13975 DF PROTO=TCP SPT=53290 DPT=995 SEQ=314981480 ACK=0 WINDOW=64240 RES=0x00 SYN URGP=0 OPT (020405B40103030801010402)</test_message>
+            </example>
+        </examples>
+      </rule>
+    </rules>
+  </ruleset>
+</patterndb>

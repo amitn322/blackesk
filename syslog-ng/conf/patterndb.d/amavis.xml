@@ -1,0 +1,29 @@
+<patterndb version='4' pub_date='2018-12-13'>
+  <ruleset name='patternize' id='f341091c-1126-3945-9972-c3ecf8a63662'>
+    <rules>
+      <rule id='9f007c6c-25fb-524f-9ae1-2b757609668c' class='system' provider='patternize'>
+        <!-- support: 1 -->
+        <patterns>
+          <pattern>(@ESTRING:testing:)@ @STRING:mail.status@ @STRING:mail.tag@ {@ESTRING:hmm:}@, [@IPvANY:clientip@]:@NUMBER:src.port@ [@IPvANY@] &lt;@EMAIL:fromemail@&gt; -&gt; &lt;@EMAIL:toemail@&gt;, Message-ID: &lt;@EMAIL:@&gt;, mail_id: @STRING@, Hits: @FLOAT:hits@, size: @NUMBER@, @ANYSTRING@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='patternize'>(25211-04) Passed CLEAN {RelayedInbound}, [40.92.2.41]:6243 [40.92.2.41] &lt;nishant322@hotmail.com&gt; -&gt; &lt;amit@amitnepal.com&gt;, Message-ID: &lt;CY4PR1301MB19731B49E859C0F14339109E9BA10@CY4PR1301MB1973.namprd13.prod.outlook.com&gt;, mail_id: yJGI6Mioym-3, Hits: -0.877, size: 4821, queued_as: 88EBD300089, dkim_sd=selector1:hotmail.com, 871 ms</test_message>
+            </example>
+        </examples>
+      </rule>
+      <rule id='4473a4e7-4288-5441-b56d-e3a310c3b627' class='system' provider='patternize'>
+        <!-- support: 1 -->
+        <patterns>
+          <pattern>(@ESTRING:testing:)@ @STRING:mail.status@ @STRING:mail.tag@ {@ESTRING:hmm:}@, [@IPvANY:clientip@]:@NUMBER:src.port@ [@IPvANY@] &lt;@EMAIL:fromemail@&gt; -&gt; &lt;@EMAIL:toemail@&gt;, Message-ID: &lt;@EMAIL:@&gt;, mail_id: @STRING::-@, @ANYSTRING@</pattern>
+        </patterns>
+        <examples>
+            <example>
+                <test_message program='patternize'>(22371-06) Passed CLEAN {RelayedInbound}, [173.45.127.119]:42354 [173.45.127.119] &lt;apache@www.nixbin.com&gt; -&gt; &lt;amit@nixbin.com&gt;, Message-ID: &lt;00ad12a927a7786b6db67305bed7c20c@www.abhizer.com&gt;, mail_id: p1053KTNBKlG, Hits: -1.899, size: 1159, queued_as: 8C08030005C, 6349 ms</test_message>
+            </example>
+        </examples>
+      </rule>
+    </rules>
+  </ruleset>
+</patterndb>
+
