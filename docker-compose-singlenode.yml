@@ -91,6 +91,7 @@ services:
       - elastic
     volumes:
       - certs:$CERTS_DIR
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
 volumes:
   data01:
     driver: local
