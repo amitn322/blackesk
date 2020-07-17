@@ -1,0 +1,17 @@
+instances:
+  - name: syslog01
+    dns:
+      - syslog01 
+      - localhost
+    ip:
+      - 127.0.0.1
+  - name: es01
+    dns:
+      - es01
+      - localhost
+    ip:
+      - 127.0.0.1
+  - name: 'kib01'
+    dns:
+      - kib01
+      - localhost

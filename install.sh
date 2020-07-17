@@ -187,7 +187,8 @@ SECONDS=0
 while true; do 
 	sleep 10
 	warn " Still waiting for Elasticsearch to be ready , $SECONDS seconds elapsed" "sameline"
-	timeout 1 sh -c 'docker exec es01 cat < /dev/null > /dev/tcp/127.0.0.1/9200' &>> /dev/null
+	#timeout 1 sh -c 'docker exec es01 cat < /dev/null > /dev/tcp/127.0.0.1/9200' &>> /dev/null
+	curl -s -k  https://localhost:9200/_security/_authenticate?pretty | grep -i '"status" : 401' &>> /dev/null
 	if [ $? -eq 0 ];then
 		echo ""
 		ok "Elasticsearch is now ready, moving on !"
@@ -213,7 +214,8 @@ ok "Waiting for Elasticsearch to be ready"
 while true; do 
 	sleep 10
 	warn " Still waiting for Elasticsearch to be ready, $SECONDS seconds elapsed" "sameline"
-	timeout 1 sh -c 'docker exec es01 cat < /dev/null > /dev/tcp/127.0.0.1/9200' &>> /dev/null
+	#timeout 1 sh -c 'docker exec es01 cat < /dev/null > /dev/tcp/127.0.0.1/9200' &>> /dev/null
+	curl -s -k  https://localhost:9200/_security/_authenticate?pretty | grep -i '"status" : 401' &>> /dev/null
 	if [ $? -eq 0 ];then
 		echo ""
 		ok "Elasticsearch is now ready, moving on !"
@@ -256,5 +258,5 @@ info "--------------------------------------------------"
 ok "Username: elastic"
 ok "Password: ${elastic_password}"
 info "--------------------------------------------------"
-info "The initial set of credentials are stored in creds.txt in the current Directory"
+info "The initial set of credentials are stored in .creds.txt in the current Directory"
 warn "Don't forget to change the default credentials, please create an issue on github for any issues."
