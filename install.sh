@@ -181,7 +181,7 @@ docker-compose -f create-certs.yml run --rm create_certs
 info "Certificates Created, Now Creating Instances for ESK Stack"
 #docker-compose up -d --force-recreate --build
 
-docker-compose -f ${COMPOSE_FILE} up -d
+docker-compose -f ${COMPOSE_FILE} up -d 
 info "Waiting for Elasticsearch to be ready..."
 SECONDS=0
 while true; do 

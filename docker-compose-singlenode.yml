@@ -31,9 +31,6 @@ services:
       - node.name=es01
       - cluster.name=es-docker-cluster
       - discovery.type=single-node
-      #- discovery.seed_hosts=es02,es03
-      #- cluster.initial_master_nodes=es01,es02,es03
-      #- cluster.initial_master_nodes=es01
       - bootstrap.memory_lock=true
       - xpack.security.enabled=true
       - xpack.license.self_generated.type=basic
@@ -54,6 +51,8 @@ services:
     volumes:
       - data01:/usr/share/elasticsearch/data
       - certs:$CERTS_DIR
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     ports:
       - 9200:9200
     networks:
@@ -70,10 +69,8 @@ services:
     container_name: kib01
     restart: always
     env_file: .env 
-    #depends_on: {"es01": {"condition": "service_healthy"}}
     depends_on:
       - es01
-        #condition: service_healthy
     ports:
       - 5601:5601
     environment:
@@ -92,6 +89,8 @@ services:
     volumes:
       - certs:$CERTS_DIR
       - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"      
 volumes:
   data01:
     driver: local

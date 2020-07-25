@@ -14,6 +14,7 @@ for i in $(seq 1 2 ${count});do
 	randomUser=`head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 `
 	randomIP=$(dd if=/dev/urandom bs=4 count=1 2>/dev/null |od -An -tu1 | sed -e 's/^ *//' -e 's/  */./g')
 	echo "Accepted password for ${randomUser} from ${randomIP} port ${randomPort} ssh2" > /tmp/ssh_logs.txt
-	logger -t sshd -f /tmp/ssh_logs.txt 
+	#logger -t sshd -f /tmp/ssh_logs.txt 
+	logger -T --rfc3164 -n 127.0.0.1 -P 514 -t sshd -f /tmp/ssh_logs.txt
 done
 echo $count Logs generated
