@@ -250,8 +250,10 @@ while true;do
 	fi 
 done 
 echo ""
+info "Setting up GeoPoint Index Mapping for syslog-ng"
+curl -k -XPUT -u elastic:${elastic_password} "https://localhost:9200/_template/syslog-ng" -H 'Content-Type: application/json' -d'{"index_patterns": ["syslog-ng_*"], "mappings" : { "properties" : { "geopoint" : { "type" : "geo_point" }} } }'
 info "Generating Some Fake Logs, you can delete the index and start over.."
-sh ./extras/loggen.sh 10
+/bin/bash ./extras/loggen.sh 10
 	
 info "Everything should have been completed, please login to https://ipaddress:5601 with following user:"
 info "--------------------------------------------------"
