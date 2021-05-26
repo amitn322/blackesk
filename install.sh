@@ -113,7 +113,7 @@ function genRandomPassword()
 	echo $password
 }
 
-sysctl -w vm.max_map_count=280530
+sudo sysctl -w vm.max_map_count=280530
 
 if [ "$1" == 'single-node' ];then
     COMPOSE_FILE="docker-compose-singlenode.yml"
