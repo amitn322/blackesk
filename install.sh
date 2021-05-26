@@ -188,7 +188,7 @@ while true; do
 	sleep 10
 	warn " Still waiting for Elasticsearch to be ready , $SECONDS seconds elapsed" "sameline"
 	#timeout 1 sh -c 'docker exec es01 cat < /dev/null > /dev/tcp/127.0.0.1/9200' &>> /dev/null
-	curl -s -k  https://localhost:9200/_security/_authenticate?pretty | grep -i '"status" : 401' &>> /dev/null
+	curl -s -k  https://localhost:9200/_security/_authenticate?pretty | grep -i '"status" : 401' &> /dev/null
 	if [ $? -eq 0 ];then
 		echo ""
 		ok "Elasticsearch is now ready, moving on !"
