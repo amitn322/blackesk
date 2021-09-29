@@ -1,6 +1,8 @@
 
 # Installation 
- - Clone the repo and run the installer 
+ - Clone the repo 
+ - Modify Environment Variables to suit your settings.
+ - and run the installer 
  ```bash
  sh install.sh <single-node|multi-node>
  ```
