@@ -10,6 +10,12 @@
  - Access Kibana Interface at https://hostnameOrIP:5601 
  - Read the output of install script for credentials :)
 
+# Uninstall
+```bash
+chmod +x uninstall.sh
+./uninstall.sh
+```
+
 # Features
  - TLS Enabled Communication between syslog-ng , kibana and elasticsearch.
  - User Roles and Authentication for Kibana Access.
