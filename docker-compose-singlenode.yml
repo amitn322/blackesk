@@ -19,10 +19,8 @@ services:
     networks:
       - syslog
     volumes:
-      - type: bind 
-        source: ${SYSLOG_CONF_DIR}
-        target: /etc/syslog-ng/ 
-      - certs:/etc/syslog-ng/certs/
+      - ${SYSLOG_CONF_DIR}:/etc/syslog-ng/:z
+      - certs:/etc/syslog-ng/certs/:z
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
     container_name: es01
@@ -49,8 +47,8 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - data01:/usr/share/elasticsearch/data
-      - certs:$CERTS_DIR
+      - data01:/usr/share/elasticsearch/data:z
+      - certs:$CERTS_DIR:z
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
     ports:
@@ -87,8 +85,8 @@ services:
     networks:
       - elastic
     volumes:
-      - certs:$CERTS_DIR
-      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - certs:$CERTS_DIR:z
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:z
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"      
 volumes:
