@@ -1,4 +1,4 @@
-FROM alpine:3.14
+FROM alpine
 ARG SYSLOG_VERSION
 ARG TIMEZONE
 ADD ./syslog-ng/build.sh /build.sh
