@@ -13,7 +13,7 @@ echo "Downloading Syslog-ng Version: ${SYSLOG_VERSION}"
 curl -L "${DOWNLOAD_URL}" > "syslog-ng-${SYSLOG_VERSION}.tar.gz"
 tar zxf "syslog-ng-${SYSLOG_VERSION}.tar.gz"
 cd "syslog-ng-${SYSLOG_VERSION}"
-./configure --enable-http  --enable-geoip2 --prefix=/ --sysconfdir=/etc/syslog-ng/ --enable-format-json --enable-json
+./configure --enable-http  --enable-geoip2 --prefix=/ --sysconfdir=/etc/syslog-ng/ --enable-format-json --enable-json --disable-java
 make
 make install
 cd ..
