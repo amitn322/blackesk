@@ -4,7 +4,8 @@
  - Modify Environment Variables to suit your settings.
  - and run the installer 
  ```bash
- sh install.sh <single-node|multi-node>
+ sudo chmod +x install.sh
+ sudo ./install.sh <single-node|multi-node>
  ```
  - Go have some coffee !
  - Access Kibana Interface at https://hostnameOrIP:5601 
@@ -12,8 +13,8 @@
 
 # Uninstall
 ```bash
-chmod +x uninstall.sh
-./uninstall.sh
+sudo chmod +x uninstall.sh
+sudo ./uninstall.sh
 ```
 
 # Features
