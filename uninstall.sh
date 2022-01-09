@@ -7,8 +7,8 @@ else
         echo "Single Node setup detected, Uninstalling.."
         docker-compose -f docker-compose-singlenode.yml down && docker volume rm es_certs es_data01
 fi
-echo "(-) Removing Syslog ng image"
-docker rmi es_syslog-ng
+#echo "(-) Removing Syslog ng image"
+#docker rmi es_syslog-ng
 echo "(-) Removing Creds file"
 rm .creds.txt
 echo "Uninstall Complete"

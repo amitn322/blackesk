@@ -11,7 +11,15 @@ instances:
       - localhost
     ip:
       - 127.0.0.1
+      - 192.168.100.240
   - name: 'kib01'
     dns:
       - kib01
       - localhost
+  - name: fleet01
+    dns:
+      - fleet01
+      - localhost
+    ip:
+      - 127.0.0.1
+      - 192.168.100.240

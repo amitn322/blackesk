@@ -15,8 +15,8 @@ services:
       '
     working_dir: /usr/share/elasticsearch
     volumes:
-      - certs:/certs
-      - .:/usr/share/elasticsearch/config/certificates
+      - certs:/certs:z
+      - .:/usr/share/elasticsearch/config/certificates:z
     networks:
       - elastic
 

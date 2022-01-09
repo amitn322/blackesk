@@ -131,10 +131,18 @@ instances:
       - localhost
     ip:
       - 127.0.0.1
+      - 192.168.100.240
   - name: 'kib01'
     dns:
       - kib01
       - localhost
+  - name: fleet01
+    dns:
+      - fleet01
+      - localhost
+    ip:
+      - 127.0.0.1
+      - 192.168.100.240
 EOF
 elif [ "$1" == 'multi-node' ];then 
     COMPOSE_FILE="docker-compose-multinode.yml"
@@ -199,15 +207,23 @@ done
 
 docker exec es01 /bin/bash -c "bin/elasticsearch-setup-passwords auto --batch --url https://es01:9200" > /tmp/creds.txt
 if [ $? -ne 0 ];then
-   fail "Couldn't Set Passwords, Aborting..."
-   exit 255
+   warn "Couldn't Set Passwords, checking for existing creds"
+   if [ -f .creds.txt ];then 
+ 	elastic_password=`grep -Po 'elastic = \K.*' .creds.txt`
+	kibana_password=`grep -Po 'kibana = \K.*' .creds.txt`
+	echo "Found existing elastic Password"
+  else 
+	fail "Couldn't set passwords, no existing credentials found"
+   	exit 255
+ fi
+else
+	KIBANA_USER=`grep KIBANA_USER .env | awk -F'=' {'print $2'}`
+	kibana_password=`grep -i "${KIBANA_USER} =" /tmp/creds.txt | awk {'print $4'}`
+	elastic_password=`grep "PASSWORD elastic =" /tmp/creds.txt | awk {'print $4'}`
+	mv /tmp/creds.txt .creds.txt
+	sed -i "s/^ELASTICSEARCH_USERNAME=.*/ELASTICSEARCH_USERNAME=${KIBANA_USER}/" .env 
+	sed -i "s/^ELASTICSEARCH_PASSWORD=.*/ELASTICSEARCH_PASSWORD=${kibana_password}/" .env 
 fi
-KIBANA_USER=`grep KIBANA_USER .env | awk -F'=' {'print $2'}`
-kibana_password=`grep -i "${KIBANA_USER} =" /tmp/creds.txt | awk {'print $4'}`
-elastic_password=`grep "PASSWORD elastic =" /tmp/creds.txt | awk {'print $4'}`
-mv /tmp/creds.txt .creds.txt
-sed -i "s/^ELASTICSEARCH_USERNAME=.*/ELASTICSEARCH_USERNAME=${KIBANA_USER}/" .env 
-sed -i "s/^ELASTICSEARCH_PASSWORD=.*/ELASTICSEARCH_PASSWORD=${kibana_password}/" .env 
 docker-compose -f ${COMPOSE_FILE} up -d
 SECONDS=0
 ok "Waiting for Elasticsearch to be ready"
@@ -245,7 +261,12 @@ while true;do
 		timeout 5 curl -k -XPOST -u elastic:${elastic_password} "https://localhost:5601/api/saved_objects/index-pattern/syslog-ng" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'{"attributes": {"title":"syslog-ng_*","timeFieldName": "ISODATE"}}'
 		info "Setting Syslog-ng_* as the Default Pattern.."
 		curl -k -XPOST -u elastic:${elastic_password} "https://localhost:5601/api/kibana/settings" -H 'kbn-xsrf: true' -H 'Content-Type: application/json' -d'{"changes": {"defaultIndex": "syslog-ng_*"}}' 	
-		
+		info "Preparing ElasticSearch and Kibana for Fleet"
+		curl -k -u elastic:${elastic_password} -XPOST https://localhost:5601/api/fleet/setup --header 'kbn-xsrf: true'
+		info "Generating Service Token for Fleet"
+		service_token=`curl -k -u elastic:${elastic_password} -s -X POST https://localhost:5601/api/fleet/service-tokens --header 'kbn-xsrf: true' | jq -r .value`
+		echo "FLEET_SERVICE_TOKEN=${service_token}" >> .env
+		docker-compose -f ${COMPOSE_FILE} up -d
 		break
 	fi 
 done 
