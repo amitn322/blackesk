@@ -224,6 +224,7 @@ else
 	sed -i "s/^ELASTICSEARCH_USERNAME=.*/ELASTICSEARCH_USERNAME=${KIBANA_USER}/" .env 
 	sed -i "s/^ELASTICSEARCH_PASSWORD=.*/ELASTICSEARCH_PASSWORD=${kibana_password}/" .env 
 fi
+elastic_creds="elastic:${elastic_password}"
 docker-compose -f ${COMPOSE_FILE} up -d
 SECONDS=0
 ok "Waiting for Elasticsearch to be ready"
@@ -265,6 +266,7 @@ while true;do
 		curl -k -u elastic:${elastic_password} -XPOST https://localhost:5601/api/fleet/setup --header 'kbn-xsrf: true'
 		info "Generating Service Token for Fleet"
 		service_token=`curl -k -u elastic:${elastic_password} -s -X POST https://localhost:5601/api/fleet/service-tokens --header 'kbn-xsrf: true' | jq -r .value`
+                sed -i '/FLEET_SERVICE_TOKEN/d' .env # Delete if there is an existing fleet service token 
 		echo "FLEET_SERVICE_TOKEN=${service_token}" >> .env
 		docker-compose -f ${COMPOSE_FILE} up -d
 		break
@@ -273,6 +275,10 @@ done
 echo ""
 info "Setting up GeoPoint Index Mapping for syslog-ng"
 curl -k -XPUT -u elastic:${elastic_password} "https://localhost:9200/_template/syslog-ng" -H 'Content-Type: application/json' -d'{"index_patterns": ["syslog-ng_*"], "mappings" : { "properties" : { "geopoint" : { "type" : "geo_point" }} } }'
+if [ "$1" -eq 'single-node' ];then
+   echo "Setting Replicas to 0 for single node setup"
+   curl -k -XPUT -u elastic:${elastic_password} -H 'Content-Type: application/json' 'https://localhost:9200/_settings' -d '{ "index" : { "number_of_replicas" : 0 } }'
+fi
 info "Generating Some Fake Logs, you can delete the index and start over.."
 /bin/bash ./extras/loggen.sh 10
 	
