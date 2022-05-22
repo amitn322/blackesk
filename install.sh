@@ -177,11 +177,11 @@ else
 fi
 
 info "Creating Certificates for the cluster"
-docker-compose -f create-certs.yml run --rm create_certs
+docker compose -f create-certs.yml run --rm create_certs
 info "Certificates Created, Now Creating Instances for ESK Stack"
-#docker-compose up -d --force-recreate --build
+#docker compose up -d --force-recreate --build
 
-docker-compose -f ${COMPOSE_FILE} up -d 
+docker compose -f ${COMPOSE_FILE} up -d 
 info "Waiting for Elasticsearch to be ready..."
 SECONDS=0
 while true; do 
@@ -208,7 +208,7 @@ elastic_password=`grep "PASSWORD elastic =" /tmp/creds.txt | awk {'print $4'}`
 mv /tmp/creds.txt .creds.txt
 sed -i "s/^ELASTICSEARCH_USERNAME=.*/ELASTICSEARCH_USERNAME=${KIBANA_USER}/" .env 
 sed -i "s/^ELASTICSEARCH_PASSWORD=.*/ELASTICSEARCH_PASSWORD=${kibana_password}/" .env 
-docker-compose -f ${COMPOSE_FILE} up -d
+docker compose -f ${COMPOSE_FILE} up -d
 SECONDS=0
 ok "Waiting for Elasticsearch to be ready"
 while true; do 
