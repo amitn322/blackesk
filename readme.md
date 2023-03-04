@@ -1,7 +1,7 @@
 
 # Installation 
  - Clone the repo 
- - Modify Environment Variables to suit your settings.
+ - Modify Environment Variables to suit your settings in `.env` file.
  - and run the installer 
  ```bash
  sudo chmod +x install.sh
